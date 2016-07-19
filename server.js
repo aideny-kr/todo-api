@@ -34,7 +34,7 @@ app.get('/todos/:id', function(req, res) {
 // POST /todos
 app.post('/todos', function(req, res) {
 
-  var body = _.pick(req.body, 'description', 'completed')
+  var body = _.pick(req.body, 'description', 'completed');
 
   if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 ) {
     // sending response "bad request"
@@ -64,6 +64,40 @@ app.delete('/todos/:id', function(req, res) {
   else {
     res.status(404).json({"error": "no todo found with that id"});
   }
+});
+
+// PUT /todos/:id
+app.put('/todos/:id', function (req, res) {
+  var todoId = +req.params.id;
+  var matchedTodo = _.findWhere(todos, {id: todoId});
+  var body = _.pick(req.body, 'description', 'completed');
+  var validAttributes = {};
+
+  // 404 not found
+  if(!matchedTodo) {
+    return res.status(404).send();
+  }
+
+  // validates 'completed'
+  if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
+    validAttributes.completed = body.completed;
+  } else if (body.hasOwnProperty('completed')) {
+    // 400 bad syntax
+    return res.status(400).send();
+  }
+
+  // validates 'description'
+  if (body.hasOwnProperty('description') && _.isString(body.description)
+  && body.description.trim().length > 0) {
+    validAttributes.description = body.description;
+  } else if (body.hasOwnProperty('description')) {
+    return res.status(400).send();
+  }
+
+  _.extend(matchedTodo, validAttributes);
+
+  res.json(matchedTodo);
+
 });
 
 app.listen(PORT, function() {
