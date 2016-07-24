@@ -17,6 +17,7 @@ app.get('/', function (req, res) {
 
 // GET /todos
 app.get('/todos', function (req, res) {
+  // query string ?completed=true
   var queryParams = req.query;
   var filteredTodos = todos;
 
