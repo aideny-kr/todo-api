@@ -43,12 +43,22 @@ app.get('/todos', function (req, res) {
 // GET /todos/:id
 app.get('/todos/:id', function(req, res) {
   var todoId = +req.params.id;
-  var matchedTodo = _.findWhere(todos, {id : todoId});
-  if(matchedTodo) {
-    res.json(matchedTodo);
-  }
-  else res.status(404).send();
-
+  // var matchedTodo = _.findWhere(todos, {id : todoId});
+  // if(matchedTodo) {
+  //   res.json(matchedTodo);
+  // }
+  // else res.status(404).send();
+  db.todo.findById(todoId)
+    .then(function(todo){
+      if(todo){
+        res.json(todo.toJSON());
+      } else {
+        res.status(404).send();
+      }
+    })
+    .catch(function(e) {
+      res.status(500).send();
+    })
 });
 
 // POST /todos
@@ -61,12 +71,10 @@ app.post('/todos', function(req, res) {
     completed: body.completed
   }).then(function(todo){
     res.status(200).send(todo.toJSON());
-  }).catch(function(e){
-    res.status(400).json(e);
-  }); 
-
-
-
+  }, function(e) {
+    console.log(e);
+    res.status(500).send();
+  })
 
   // if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 ) {
   //   // sending response "bad request"
