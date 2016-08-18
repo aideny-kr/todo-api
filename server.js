@@ -94,14 +94,15 @@ app.post('/todos', middleware.requireAuthentication, function(req, res) {
 
   var body = _.pick(req.body, 'description', 'completed');
 
-  db.todo.create({
-    description: body.description,
-    completed: body.completed
-  }).then(function(todo){
-    res.status(200).send(todo.toJSON());
+  db.todo.create(body).then(function(todo){
+    //req.user is accessible from middleware
+    req.user.addTodo(todo).then(function () {
+      return todo.reload();
+    }).then(function (todo) {
+      res.status(200).send(todo.toJSON());
+    })
   }, function(e) {
-    console.log(e);
-    res.status(500).send();
+    res.status(400).send();
   })
 
   // if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 ) {

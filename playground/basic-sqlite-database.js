@@ -31,14 +31,14 @@ User.hasMany(Todo);
 
 // {force:true} as param in sync will drop all table and start from beginning
 sequelize.sync({
-  //force:true
+//  force:true
 }).then(function() {
   console.log('Everything is in sync');
 
   User.findById(1).then(function (user) {
     user.getTodos({
       where: {
-        completed: true
+        completed: false
       }
     }).then(function (todos) {
       todos.forEach(function (todo) {
